@@ -16,6 +16,13 @@ function setSaveButton() {
 	download(JSON.stringify({"text":textInput.value,"variables":variables,"answer":answerFormulaInput.value}), filename+'.wps', 'text/plain');
 }
 
+function parseRandomNumber(x) {//1,5,1
+    //return random number
+}
+
+function parseVariable() {
+}
+
 function addVariable() {
 	variableName = avalibleVariableNames.pop();
     if (variableName == undefined) {
@@ -25,6 +32,7 @@ function addVariable() {
 	newVariable.id = variableName+"Div";
     
     newIdBox = document.createElement("span");
+    newIdBox.textContent = "{"+variableName+"}";
     newVariable.appendChild(newIdBox);
     
 	newTextBox = document.createElement("input");
@@ -32,12 +40,15 @@ function addVariable() {
     newVariable.appendChild(newTextBox);
     
     newPreviewBox = document.createElement("span");
+    newPreviewBox.id = variableName+"PreviewBox";
     newVariable.appendChild(newPreviewBox);
     
     newRemoveButton = document.createElement("button");
-    newRemoveButton.onclick = function (buttonElement) {
-        buttonElement.parentElement.remove();//  bug how do I get buttonElement
+    newRemoveButton.id = variableName+"RemoveButton";
+    newRemoveButton.onclick = function (e) {
+        e.currentTarget.parentNode.remove();//  bug how do I get buttonElement
     }
+    newRemoveButton.textContent="-";
     newVariable.appendChild(newRemoveButton);
     
 	variablesDiv.appendChild(newVariable);
@@ -47,7 +58,7 @@ function addVariable() {
 
 textInput.oninput = setSaveButton;
 answerFormulaInput.oninput = setSaveButton;
-addVariableButton.onclick = newVariable;
+addVariableButton.onclick = addVariable;
 setSaveButton();
 
 
