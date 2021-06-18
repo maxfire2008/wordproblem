@@ -12,13 +12,29 @@ Array.prototype.remove = function() {
 var avalibleVariableNames = ['Red', 'HoneyDew', 'Beige', 'DarkTurquoise', 'DarkMagenta', 'DarkGreen', 'Crimson', 'Bisque', 'Magenta', 'SeaGreen', 'Snow', 'Grey', 'LightSeaGreen', 'DimGrey', 'Navy', 'LightGreen', 'MintCream', 'Linen', 'LavenderBlush', 'Turquoise', 'Plum', 'DarkViolet', 'MediumSeaGreen', 'MistyRose', 'DarkOrchid', 'LightPink', 'DarkSlateGray', 'HotPink', 'RosyBrown', 'DarkSalmon', 'MediumTurquoise', 'Orange', 'DarkGoldenRod', 'IndianRed', 'Azure', 'MediumSlateBlue', 'LightGrey', 'SandyBrown', 'BlueViolet', 'LightBlue', 'LightSlateGrey', 'BurlyWood', 'PaleTurquoise', 'SeaShell', 'LightSkyBlue', 'PaleVioletRed', 'Ivory', 'LightYellow', 'SlateGrey', 'MediumPurple', 'PeachPuff', 'SkyBlue', 'NavajoWhite', 'AntiqueWhite', 'LawnGreen', 'MidnightBlue', 'Fuchsia', 'GreenYellow', 'White', 'CornflowerBlue', 'Gold', 'DarkGrey', 'RoyalBlue', 'Salmon', 'DarkKhaki', 'CadetBlue', 'GhostWhite', 'DarkCyan', 'PaleGreen', 'Orchid', 'Green', 'Indigo', 'YellowGreen', 'MediumAquaMarine', 'Khaki', 'DarkBlue', 'FloralWhite', 'Coral', 'Cyan', 'LimeGreen', 'LightSlateGray', 'LemonChiffon', 'PapayaWhip', 'Purple', 'Olive', 'SpringGreen', 'Violet', 'MediumBlue', 'DarkRed', 'BlanchedAlmond', 'LightGoldenRodYellow', 'Blue', 'OrangeRed', 'MediumSpringGreen', 'Brown', 'DeepSkyBlue', 'Sienna', 'Wheat', 'DarkSlateGrey', 'DarkSeaGreen', 'DeepPink', 'Tomato', 'DarkGray', 'Gray', 'FireBrick', 'Moccasin', 'Silver', 'GoldenRod', 'LightSalmon', 'Peru', 'DarkOliveGreen', 'Chocolate', 'AliceBlue', 'DimGray', 'OldLace', 'Black', 'ForestGreen', 'LightCoral', 'Tan', 'Chartreuse', 'LightCyan', 'PowderBlue', 'Lavender', 'Gainsboro', 'OliveDrab', 'Aquamarine', 'Lime', 'Thistle', 'RebeccaPurple', 'PaleGoldenRod', 'MediumVioletRed', 'Cornsilk', 'SteelBlue', 'Maroon', 'DarkSlateBlue', 'Teal', 'LightGray', 'SaddleBrown', 'LightSteelBlue', 'DarkOrange', 'SlateBlue', 'SlateGray', 'Aqua', 'Yellow', 'MediumOrchid', 'Pink', 'WhiteSmoke', 'DodgerBlue'];
 var variables = [];
 var variableCount = 0;
+var variableListCalls = {
+    "names": [
+        "Tim",
+        "Joe",
+    ],
+};
 var variableTypes = [
     {
         "regex": /^rand\([0-9]{1,},[0-9]{1,}(,[0-9]{1,}){0,1}\)$/,
         "function": function (x) {//parseRandomNumber
             //return random number
             console.log("Process Random "+x);
-            return x;
+            return 5;
+        },
+        "regex": /^returnopposite\([{}A-Za-z0-9]{1,}\)$/,
+        "function": function (x) {//parseRandomNumber
+            //return random number
+            console.log("Process oppisite "+x);
+            if (x="returnopposite({DodgerBlue})") {
+                return "{WhiteSmoke}";
+            } else {
+                return "{DodgerBlue}";
+            }
         },
     }
 ];
@@ -38,12 +54,28 @@ function setSaveButton() {
 	download(JSON.stringify({"text":textInput.value,"variables":variables,"answer":answerFormulaInput.value}), filename+'.wps', 'text/plain');
 }
 
-function parseVariable(x) {
+function getFormula(x) {
+    if (x.match(/^[A-Za-z0-9]{1,}$/)) {
+        return document.getElementById(x+"TextBox").value;
+    } else if (x.match(/^{[A-Za-z0-9]{1,}}$/)) {
+        v = x.slice(1,x.length-1);
+        return document.getElementById(v+"TextBox").value;
+    }
+}
+
+function parseFormula(x) {
     for (i = 0; i < variableTypes.length; i++) {
         if (x.match(variableTypes[i]["regex"])) {
-            variableTypes[i]["function"](x);
+            x.replace(
+                /{[A-Za-z0-9]{1,}}/g,
+                function (a) {
+                    parseFormula(getFormula(a));
+                }
+            );
+            var output = variableTypes[i]["function"](x);
         }
     }
+    return output;
 }
 
 function updatePreview(variableName) {
