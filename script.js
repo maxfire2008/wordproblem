@@ -18,23 +18,13 @@ var variableListCalls = {
         "Joe",
     ],
 };
-var variableTypes = [
+var formulaTypes = [
     {
         "regex": /^rand\([0-9]{1,},[0-9]{1,}(,[0-9]{1,}){0,1}\)$/,
         "function": function (x) {//parseRandomNumber
             //return random number
             console.log("Process Random "+x);
             return 5;
-        },
-        "regex": /^returnopposite\([{}A-Za-z0-9]{1,}\)$/,
-        "function": function (x) {//parseRandomNumber
-            //return random number
-            console.log("Process oppisite "+x);
-            if (x="returnopposite({DodgerBlue})") {
-                return "{WhiteSmoke}";
-            } else {
-                return "{DodgerBlue}";
-            }
         },
     }
 ];
@@ -63,16 +53,16 @@ function getFormula(x) {
     }
 }
 
-function parseFormula(x) {
-    for (i = 0; i < variableTypes.length; i++) {
-        if (x.match(variableTypes[i]["regex"])) {
-            x.replace(
-                /{[A-Za-z0-9]{1,}}/g,
-                function (a) {
-                    parseFormula(getFormula(a));
-                }
-            );
-            var output = variableTypes[i]["function"](x);
+function calculateFormula(x) {
+    x.replace(
+        /{[A-Za-z0-9]{1,}}/g,
+        function (a) {
+            calculateFormula(getFormula(a));
+        }
+    );
+    for (i = 0; i < formulaTypes.length; i++) {
+        if (x.match(formulaTypes[i]["regex"])) {
+            var output = formulaTypes[i]["function"](x);
         }
     }
     return output;
@@ -114,7 +104,6 @@ function addVariable() {
     
 	variablesDiv.appendChild(newVariable);
     variableCount+=1;
-    console.log(variableName);
 }
 
 textInput.oninput = setSaveButton;
