@@ -46,10 +46,10 @@ function setSaveButton() {
 
 function getFormula(x) {
     if (x.match(/^[A-Za-z0-9]{1,}$/)) {
-        return document.getElementById(x+"TextBox").value;
+        return document.getElementById(x+"_TextBox").value;
     } else if (x.match(/^{[A-Za-z0-9]{1,}}$/)) {
         v = x.slice(1,x.length-1);
-        return document.getElementById(v+"TextBox").value;
+        return document.getElementById(v+"_TextBox").value;
     }
 }
 
@@ -68,8 +68,10 @@ function calculateFormula(x) {
     return output;
 }
 
-function updatePreview(variableName) {
-    document.getElementById(variableName+"");
+function updatePreview(e) {
+    variableName = e.currentTarget.id.split("_")[0];
+    textBox = document.getElementById(variableName+"_TextBox");
+    previewBox = document.getElementById(variableName+"_PreviewBox");
 }
 
 function addVariable() {
@@ -78,22 +80,23 @@ function addVariable() {
         variableName = "extraVarName"+variableCount;
     }
 	newVariable = document.createElement("div");
-	newVariable.id = variableName+"Div";
+	newVariable.id = variableName+"_Div";
     
     newIdBox = document.createElement("span");
     newIdBox.textContent = "{"+variableName+"}";
     newVariable.appendChild(newIdBox);
     
 	newTextBox = document.createElement("input");
-	newTextBox.id = variableName+"TextBox";
+	newTextBox.id = variableName+"_TextBox";
+    newTextBox.oninput = updatePreview;
     newVariable.appendChild(newTextBox);
     
     newPreviewBox = document.createElement("span");
-    newPreviewBox.id = variableName+"PreviewBox";
+    newPreviewBox.id = variableName+"_PreviewBox";
     newVariable.appendChild(newPreviewBox);
     
     newRemoveButton = document.createElement("button");
-    newRemoveButton.id = variableName+"RemoveButton";
+    newRemoveButton.id = variableName+"_RemoveButton";
     newRemoveButton.onclick = function (e) {
         e.currentTarget.parentNode.remove();
     }
@@ -106,9 +109,14 @@ function addVariable() {
     variableCount+=1;
 }
 
-textInput.oninput = setSaveButton;
-answerFormulaInput.oninput = setSaveButton;
-addVariableButton.onclick = addVariable;
-setSaveButton();
+function initilise() {
+    textInput.oninput = setSaveButton;
+    answerFormulaInput.oninput = setSaveButton;
+    addVariableButton.onclick = addVariable;
+    setSaveButton();
+    randomSeed.value = Math.round(Math.random()*(10**15));
+}
+
+initilise();
 
 
